@@ -1,0 +1,1 @@
+<img src="{{ asset('logogenz.png') }}" alt="Logo Psikologi Online" {{ $attributes }}>
