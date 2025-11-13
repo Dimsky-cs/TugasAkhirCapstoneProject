@@ -26,8 +26,6 @@ class User extends Authenticatable
         'provider_name',
         'provider_id',
         'provider_avatar',
-        'dob', // <-- TAMBAHKAN BARIS INI
-        'phone',
     ];
 
     /**

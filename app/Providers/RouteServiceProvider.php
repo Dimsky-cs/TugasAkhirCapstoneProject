@@ -17,7 +17,11 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    public const HOME = '/redirect-after-login';
+
+    // --- INI DIA BIANG KEROKNYA ---
+    // GANTI BARIS LAMA KAMU (public const HOME = '/redirect-after-login';)
+    // MENJADI BARIS DI BAWAH INI:
+    public const HOME = '/dashboard';
 
 
     /**
