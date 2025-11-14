@@ -16,8 +16,8 @@
 
             <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
                 <div class="px-8 py-6 bg-gray-50 border-b">
-                    <h2 class="text-2xl font-bold text-gray-800 text-center">Buat Jadwal Konseling Anda</h2>
-                    <p class="text-center text-gray-500 mt-1">Lengkapi formulir di bawah untuk mengatur sesi Anda.</p>
+                    <h2 class="text-2xl font-bold text-gray-800 text-center">Buat Jadwal Konseling Kamu</h2>
+                    <p class="text-center text-gray-500 mt-1">Lengkapi formulir di bawah untuk mengatur sesi Kamu.</p>
                 </div>
                 <div class="p-8">
                     <form id="booking-form" action="{{ route('user.konseling.store') }}" method="POST">
@@ -29,7 +29,7 @@
                                 class="text-lg font-semibold text-pink-600 border-b-2 border-pink-200 pb-2 mb-4 flex items-center">
                                 <span
                                     class="bg-pink-500 text-white rounded-full h-8 w-8 text-sm font-bold flex items-center justify-center mr-3">1</span>
-                                Informasi Kontak Anda
+                                Informasi Kontak Kamu
                             </h3>
 
                             <!-- Input Nama & Email Readonly (Revisi Fitur 1) -->
@@ -78,7 +78,7 @@
                                 class="text-lg font-semibold text-green-600 border-b-2 border-green-200 pb-2 mb-4 flex items-center">
                                 <span
                                     class="bg-green-500 text-white rounded-full h-8 w-8 text-sm font-bold flex items-center justify-center mr-3">2</span>
-                                Detail Sesi Anda
+                                Detail Sesi Kamu
                             </h3>
 
                             <div class="mt-4">
@@ -158,10 +158,10 @@
                                 class="text-lg font-semibold text-gray-700 border-b-2 border-gray-200 pb-2 mb-4 flex items-center">
                                 <span
                                     class="bg-gray-500 text-white rounded-full h-8 w-8 text-sm font-bold flex items-center justify-center mr-3">3</span>
-                                Apa yang Paling Anda Rasakan?
+                                Apa yang Paling Kamu Rasakan?
                             </h3>
                             <p class="text-sm text-gray-500 mb-3">Pilih satu atau lebih tag yang paling mewakili
-                                perasaan Anda saat ini.</p>
+                                perasaan Kamu saat ini.</p>
 
                             <input type="hidden" id="description" name="description" value="{{ old('description') }}">
 
@@ -179,7 +179,7 @@
                                 lain yang ingin ditambahkan? (Opsional)</label>
                             <textarea id="description_optional" rows="3"
                                 class="shadow-sm focus:ring-gray-500 focus:border-gray-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
-                                placeholder="Tuliskan cerita singkat Anda di sini..."></textarea>
+                                placeholder="Tuliskan cerita singkat Kamu di sini..."></textarea>
                         </div>
 
                         <!-- Tombol Aksi -->
@@ -348,7 +348,7 @@
                     }
 
                     function populatePsikologDropdown(psikologs, selectedId) {
-                        psikologSelect.innerHTML = '<option value="" disabled selected>-- Pilih Psikolog Anda --</option>';
+                        psikologSelect.innerHTML = '<option value="" disabled selected>-- Pilih Psikolog Kamu --</option>';
                         psikologs.forEach(psikolog => {
                             const option = document.createElement('option');
                             option.value = psikolog.id;

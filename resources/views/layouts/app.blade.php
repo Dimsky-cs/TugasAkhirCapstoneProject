@@ -34,6 +34,7 @@
             background-color: #f9fafb !important;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body class="font-sans antialiased">

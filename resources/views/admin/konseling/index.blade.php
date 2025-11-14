@@ -98,7 +98,7 @@
                                                         class="text-indigo-600 hover:text-indigo-900">Edit</a>
                                                     <form action="{{ route('admin.konseling.destroy', $booking->id) }}"
                                                         method="POST"
-                                                        onsubmit="return confirm('Apakah Anda yakin ingin menghapus jadwal ini?');">
+                                                        onsubmit="return confirm('Apakah Kamu yakin ingin menghapus jadwal ini?');">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit"

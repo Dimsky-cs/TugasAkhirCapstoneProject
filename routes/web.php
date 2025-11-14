@@ -7,7 +7,8 @@ use App\Http\Controllers\KonselingController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\KonselingController as AdminKonselingController;
 use App\Http\Controllers\SocialLoginController;
-use App\Http\Controllers\PsikologController; // Pastikan ini ada
+use App\Http\Controllers\PsikologController;
+use App\Http\Controllers\Admin\UserManagementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,6 +52,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/konseling/{konseling}/edit', [AdminKonselingController::class, 'edit'])->name('konseling.edit');
     Route::patch('/konseling/{konseling}', [AdminKonselingController::class, 'update'])->name('konseling.update');
     Route::delete('/konseling/{konseling}', [AdminKonselingController::class, 'destroy'])->name('konseling.destroy');
+
+    // [BARU] RUTE MANAJEMEN USER (CRUD)
+    Route::resource('users', UserManagementController::class)->except(['show']);
 });
 
 // --- GRUP UNTUK USER (KLIEN) ---

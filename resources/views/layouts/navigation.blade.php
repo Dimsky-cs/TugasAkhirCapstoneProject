@@ -75,6 +75,10 @@
                                 <x-dropdown-link :href="route('admin.dashboard')">
                                     {{ __('Admin Dashboard') }}
                                 </x-dropdown-link>
+
+                                <x-dropdown-link :href="route('admin.users.index')">
+                                    {{ __('Manajemen User') }}
+                                </x-dropdown-link>
                             @elseif (Auth::user()->role === 'psikolog')
                                 {{-- UNTUK PSIKOLOG --}}
                                 <x-dropdown-link :href="route('psikolog.dashboard')">

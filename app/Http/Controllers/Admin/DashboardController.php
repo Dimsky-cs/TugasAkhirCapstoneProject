@@ -3,43 +3,76 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\User;
 use App\Models\Konseling;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; // <-- [PENTING] Tambahkan ini
+use Carbon\Carbon; // <-- [PENTING] Tambahkan ini
 
 class DashboardController extends Controller
 {
-    /**
-     * Menampilkan halaman dashboard admin dengan data statistik.
-     */
     public function index()
     {
-        // Menghitung total pengguna dengan role 'user'
-        $totalUsers = User::where('role', 'user')->count();
+        // --- 1. LOGIKA STAT CARDS (5 KARTU) ---
+        $totalPengguna = User::where('role', 'user')->count();
+        $totalPsikolog = User::where('role', 'psikolog')->count(); // <-- KARTU BARU
+        $totalBooking = Konseling::count();
+        $bookingPending = Konseling::where('status', 'pending')->count();
+        $sesiSelesai = Konseling::where('status', 'completed')->count();
 
-        // Menghitung total booking
-        $totalBookings = Konseling::count();
+        // Kumpulkan data stats
+        $stats = [
+            'totalPengguna' => $totalPengguna,
+            'totalPsikolog' => $totalPsikolog,
+            'totalBooking' => $totalBooking,
+            'bookingPending' => $bookingPending,
+            'sesiSelesai' => $sesiSelesai,
+        ];
 
-        // Menghitung booking yang masih pending
-        $pendingBookings = Konseling::where('status', 'pending')->count();
+        // --- 2. LOGIKA TABEL "PERLU KONFIRMASI" (Sama seperti sebelumnya) ---
+        $konselingsPending = Konseling::with('user', 'psikolog')
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'asc')
+            ->limit(5) // Ambil 5 terbaru
+            ->get();
 
-        // Menghitung booking yang sudah selesai
-        $completedBookings = Konseling::where('status', 'completed')->count();
 
-        // Mengambil 5 booking terbaru yang statusnya pending untuk ditampilkan di tabel
-        $recentBookings = Konseling::where('status', 'pending')
-                                    ->orderBy('created_at', 'desc')
-                                    ->limit(5)
-                                    ->get();
+        // --- 3. [BARU] LOGIKA CHART TREN BOOKING (7 HARI TERAKHIR) ---
+        $bookingData = Konseling::select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('count(*) as total')
+            )
+            ->where('created_at', '>=', Carbon::now()->subDays(7))
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get();
 
-        // Mengirim semua data ke view
+        // Siapkan array untuk chart
+        $chartBookingLabels = $bookingData->pluck('date')->map(function ($date) {
+            return Carbon::parse($date)->format('d M'); // Format: "14 Nov"
+        });
+        $chartBookingData = $bookingData->pluck('total');
+
+
+        // --- 4. [BARU] LOGIKA CHART LAYANAN POPULER (PIE CHART) ---
+        $layananData = Konseling::select('service_type', DB::raw('count(*) as total'))
+            ->groupBy('service_type')
+            ->get();
+
+        $chartLayananLabels = $layananData->pluck('service_type')->map(function ($layanan) {
+            return ucfirst($layanan); // Format: "Karier", "Stres"
+        });
+        $chartLayananData = $layananData->pluck('total');
+
+
+        // --- 5. KIRIM SEMUA DATA KE VIEW ---
         return view('admin.dashboard', compact(
-            'totalUsers',
-            'totalBookings',
-            'pendingBookings',
-            'completedBookings',
-            'recentBookings'
+            'stats',
+            'konselingsPending',
+            'chartBookingLabels',
+            'chartBookingData',
+            'chartLayananLabels',
+            'chartLayananData'
         ));
     }
 }
-
