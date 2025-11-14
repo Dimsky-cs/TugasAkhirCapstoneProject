@@ -32,41 +32,47 @@
                                 Informasi Kontak Anda
                             </h3>
 
-                            <!-- FITUR 1 (REVISI): Input terlihat tapi Readonly -->
+                            <!-- Input Nama & Email Readonly (Revisi Fitur 1) -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                                 <div>
-                                    <label for="client_name" class="block text-sm font-medium text-gray-700 mb-1">Nama
-                                        Lengkap</label>
-                                    <input type="text" id="client_name" name="client_name"
-                                        value="{{ Auth::user()->name }}"
+                                    <label for="client_name_display"
+                                        class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                                    <input type="text" id="client_name_display" value="{{ Auth::user()->name }}"
                                         class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm sm:text-sm bg-gray-100 text-gray-500"
                                         readonly>
-                                    <p class="text-xs text-gray-500 mt-1">Nama diambil dari akun Anda.</p>
                                 </div>
                                 <div>
-                                    <label for="client_email"
+                                    <label for="client_email_display"
                                         class="block text-sm font-medium text-gray-700 mb-1">Alamat Email</label>
-                                    <input type="email" id="client_email" name="client_email"
-                                        value="{{ Auth::user()->email }}"
+                                    <input type="email" id="client_email_display" value="{{ Auth::user()->email }}"
                                         class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm sm:text-sm bg-gray-100 text-gray-500"
                                         readonly>
-                                    <p class="text-xs text-gray-500 mt-1">Email diambil dari akun Anda.</p>
                                 </div>
+
+                                <!-- [FITUR 2: INPUT TELEPON BARU] -->
                                 <div class="md:col-span-2">
-                                    <label for="client_phone" class="block text-sm font-medium text-gray-700 mb-1">Nomor
-                                        Telepon (WhatsApp)</label>
-                                    <input type="tel" id="client_phone" name="client_phone"
-                                        value="{{ old('client_phone', Auth::user()->phone) }}"
+                                    <label for="client_phone_input"
+                                        class="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon
+                                        (WhatsApp)</label>
+
+                                    <!-- Input ini HANYA untuk tampilan & library -->
+                                    <input type="tel" id="client_phone_input"
                                         class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
-                                        placeholder="Contoh: 081234567890" required>
+                                        required>
+
+                                    <!-- Input ini yang akan dikirim ke server (hidden) -->
+                                    <input type="hidden" id="client_phone" name="client_phone"
+                                        value="{{ old('client_phone', Auth::user()->phone) }}">
+
                                     @error('client_phone')
                                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                                     @enderror
                                 </div>
+                                <!-- [AKHIR FITUR 2] -->
                             </div>
                         </div>
 
-                        <!-- Langkah 2: Detail Sesi -->
+                        <!-- Langkah 2: Detail Sesi (Sudah ada Fitur 4) -->
                         <div class="mb-8">
                             <h3
                                 class="text-lg font-semibold text-green-600 border-b-2 border-green-200 pb-2 mb-4 flex items-center">
@@ -75,7 +81,6 @@
                                 Detail Sesi Anda
                             </h3>
 
-                            <!-- JENIS LAYANAN -->
                             <div class="mt-4">
                                 <label for="service_type" class="block text-sm font-medium text-gray-700 mb-1">Jenis
                                     Layanan</label>
@@ -96,7 +101,6 @@
                                 </select>
                             </div>
 
-                            <!-- PREFERENSI SESI (FITUR 4) -->
                             <div class="mt-4">
                                 <label for="session_preference"
                                     class="block text-sm font-medium text-gray-700 mb-1">Preferensi Sesi</label>
@@ -117,7 +121,6 @@
                                 </select>
                             </div>
 
-                            <!-- PILIH PSIKOLOG (Dinamis) -->
                             <div class="mt-4">
                                 <label for="psikolog_id" class="block text-sm font-medium text-gray-700 mb-1">Pilih
                                     Psikolog</label>
@@ -128,7 +131,6 @@
                                 </select>
                             </div>
 
-                            <!-- TANGGAL & WAKTU (Dinamis) -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                                 <div>
                                     <label for="consultation_date"
@@ -197,7 +199,7 @@
                 </div>
             </div>
 
-            <!-- SCRIPT GABUNGAN (AJAX + GUIDED PROMPTS) -->
+            <!-- SCRIPT GABUNGAN (AJAX + GUIDED PROMPTS + INT-TEL-INPUT) -->
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
 
@@ -214,6 +216,45 @@
                     const hiddenDescription = document.getElementById('description');
                     const optionalText = document.getElementById('description_optional');
                     let selectedTags = [];
+
+                    // --- Variabel untuk INT-TEL-INPUT ---
+                    const phoneInput = document.querySelector("#client_phone_input");
+                    const hiddenPhoneInput = document.querySelector("#client_phone");
+                    const bookingForm = document.querySelector("#booking-form");
+
+                    // Inisialisasi intl-tel-input
+                    const iti = window.intlTelInput(phoneInput, {
+                        initialCountry: "id", // Default Indonesia
+                        separateDialCode: true, // Tampilkan +62 terpisah
+                        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js", // Wajib untuk validasi & formatting
+                    });
+
+                    // Set nilai awal (jika ada dari 'old' atau 'auth')
+                    if (hiddenPhoneInput.value) {
+                        iti.setNumber(hiddenPhoneInput.value);
+                    }
+
+                    // Saat form di-submit, update hidden input dengan format internasional
+                    bookingForm.addEventListener('submit', function() {
+                        if (iti.isValidNumber()) {
+                            hiddenPhoneInput.value = iti.getNumber(); // cth: +628123456789
+                        } else {
+                            // Jika mau, bisa tambahkan validasi frontend di sini
+                            // Tapi kita sudah punya validasi regex di backend
+                            // Jika nomor tidak valid, biarkan submit, nanti backend yang handle
+                            // Untuk safety, kita set manual
+                            hiddenPhoneInput.value = iti.getNumber();
+                        }
+                    });
+
+                    // Update hidden input setiap kali user ganti negara atau mengetik
+                    phoneInput.addEventListener('input', function() {
+                        hiddenPhoneInput.value = iti.getNumber();
+                    });
+                    phoneInput.addEventListener('countrychange', function() {
+                        hiddenPhoneInput.value = iti.getNumber();
+                    });
+
 
                     // --- INISIALISASI GUIDED PROMPTS (FITUR 3) ---
                     function updateHiddenDescription() {
@@ -300,8 +341,6 @@
                             });
                     }
 
-                    // --- Helper Functions untuk AJAX ---
-
                     function resetPsikologDropdown(message) {
                         psikologSelect.innerHTML = `<option value="" disabled selected>${message}</option>`;
                         psikologSelect.disabled = true;
@@ -349,7 +388,7 @@
                         }
                     }
 
-                    // --- Pemicu Otomatis (jika ada error validasi) ---
+                    // Pemicu Otomatis (jika ada error validasi)
                     if (serviceSelect.value) {
                         serviceSelect.dispatchEvent(new Event('change'));
                         if ('{{ old('psikolog_id') }}' && '{{ old('consultation_date') }}') {
@@ -360,14 +399,14 @@
 
                             setTimeout(() => {
                                 psikologSelect.value = '{{ old('psikolog_id') }}';
-                                if (psikologSelect.value) { // Cek lagi jika psikolog_id-nya valid
+                                if (psikologSelect.value) {
                                     fetchAvailableTimes();
                                 }
-                            }, 500); // Delay 500ms untuk menunggu psikolog di-load
+                            }, 500);
                         }
                     }
 
-                    // --- Pemicu Otomatis untuk Guided Prompts (jika ada error validasi) ---
+                    // Pemicu Otomatis untuk Guided Prompts (jika ada error validasi)
                     const oldDescription = '{{ old('description') }}';
                     if (oldDescription) {
                         const parts = oldDescription.split(' - ');
@@ -382,14 +421,12 @@
                             }
                         });
 
-                        if (!tagsPart.includes(',') && !oldTags
-                            .length) { // Jika tidak ada tag, anggap semua adalah teks opsional
+                        if (!tagsPart.includes(',') && !oldTags.length) {
                             optionalText.value = optionalPart;
                         } else if (parts.length > 1) {
                             optionalText.value = optionalPart;
                         }
 
-                        // Update hidden input di awal
                         updateHiddenDescription();
                     }
                 });

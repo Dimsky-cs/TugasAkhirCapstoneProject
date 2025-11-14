@@ -7,7 +7,7 @@ use App\Http\Controllers\KonselingController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\KonselingController as AdminKonselingController;
 use App\Http\Controllers\SocialLoginController;
-use App\Http\Controllers\PsikologController;
+use App\Http\Controllers\PsikologController; // Pastikan ini ada
 
 /*
 |--------------------------------------------------------------------------
@@ -15,111 +15,79 @@ use App\Http\Controllers\PsikologController;
 |--------------------------------------------------------------------------
 */
 
-// --------------------------------------------------------------------------
-// RUTE PUBLIK (BISA DIAKSES SEMUA ORANG)
-// --------------------------------------------------------------------------
+// --- HALAMAN PUBLIK (GUEST) ---
 Route::get('/', function () {
     return view('home');
-});
+})->name('home');
 
-Route::get('/layanan', function () {
-    return view('layanan');
-})->name('layanan');
-
-Route::get('/kontak', function () {
-    return view('kontak');
-})->name('kontak');
-
-Route::get('/tentang-kami', function () {
-    return view('tentang');
-})->name('tentang');
-
-
-// --------------------------------------------------------------------------
-// RUTE AUTENTIKASI DASAR
-// --------------------------------------------------------------------------
-
-// Rute /dashboard UTAMA
-// Ini akan OTOMATIS mengarahkan user ke dashboard yang benar (admin/user)
+// --- LOGIKA REDIRECT SETELAH LOGIN (3 ROLE) ---
 Route::get('/dashboard', function () {
-    if (Auth::user()->role === 'admin') {
+    $role = Auth::user()->role;
+
+    if ($role === 'admin') {
         return redirect()->route('admin.dashboard');
     }
-    // Asumsi default adalah user jika bukan admin
+
+    // --- INI PERBAIKANNYA ---
+    if ($role === 'psikolog') {
+        return redirect()->route('psikolog.dashboard'); // <-- INI YANG KURANG
+    }
+    // -------------------------
+
+    // Default untuk 'user'
     return redirect()->route('user.dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard'); // <-- Nama 'dashboard' tetap di sini
 
-// Rute Profil (Umum untuk semua user yang login)
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-// Rute Social Login
-Route::get('/auth/{provider}/redirect', [SocialLoginController::class, 'redirectToProvider'])->name('social.redirect');
-Route::get('/auth/{provider}/callback', [SocialLoginController::class, 'handleProviderCallback']);
-Route::get('/auth/google/callback', [SocialLoginController::class, 'handleProviderCallback']); // <-- Rute spesifik google jika diperlukan
-
-// Ini akan mengimpor rute login, register, dll. dari auth.php
-require __DIR__.'/auth.php';
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 
-// --------------------------------------------------------------------------
-// GROUP RUTE ADMIN
-// --------------------------------------------------------------------------
+// --- GRUP UNTUK ADMIN (TETAP AMAN) ---
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-
-    // Dashboard Admin: /admin/dashboard
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-    // Konseling (Admin)
+    // Rute manajemen konseling
     Route::get('/konseling', [AdminKonselingController::class, 'index'])->name('konseling.index');
     Route::get('/konseling/create', [AdminKonselingController::class, 'create'])->name('konseling.create');
     Route::post('/konseling', [AdminKonselingController::class, 'store'])->name('konseling.store');
     Route::get('/konseling/{konseling}/edit', [AdminKonselingController::class, 'edit'])->name('konseling.edit');
     Route::patch('/konseling/{konseling}', [AdminKonselingController::class, 'update'])->name('konseling.update');
     Route::delete('/konseling/{konseling}', [AdminKonselingController::class, 'destroy'])->name('konseling.destroy');
-
-    // ... Tambahkan rute admin lainnya di sini ...
-
 });
 
-
-// --------------------------------------------------------------------------
-// GROUP RUTE USER
-// --------------------------------------------------------------------------
+// --- GRUP UNTUK USER (KLIEN) ---
 Route::middleware(['auth', 'role:user'])->prefix('user')->name('user.')->group(function () {
-
-    // Dashboard User: /user/dashboard
     Route::get('/dashboard', function () {
-        return view('user.dashboard'); // Pastikan view ini ada: resources/views/user/dashboard.blade.php
+        return view('user.dashboard');
     })->name('dashboard');
 
-    // Konseling (User)
+    // Rute booking & riwayat
     Route::get('/konseling', [KonselingController::class, 'index'])->name('konseling.index');
     Route::get('/konseling/create', [KonselingController::class, 'create'])->name('konseling.create');
     Route::post('/konseling', [KonselingController::class, 'store'])->name('konseling.store');
+});
 
-    // ... Tambahkan rute user lainnya di sini ...
-
+// --- [BARU] GRUP UNTUK PSIKOLOG ---
+Route::middleware(['auth', 'role:psikolog'])->prefix('psikolog')->name('psikolog.')->group(function () {
+    Route::get('/dashboard', [PsikologController::class, 'index'])->name('dashboard');
+    Route::get('/sesi/{konseling}/edit', [PsikologController::class, 'edit'])->name('sesi.edit');
+    Route::patch('/sesi/{konseling}', [PsikologController::class, 'update'])->name('sesi.update');
 });
 
 
+// --- RUTE PROFIL (UMUM) ---
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
 
+// --- RUTE AUTENTIKASI (LOGIN, GOOGLE, DLL) ---
+Route::get('/auth/{provider}/redirect', [SocialLoginController::class, 'redirectToProvider'])->name('social.redirect');
+Route::get('/auth/{provider}/callback', [SocialLoginController::class, 'handleProviderCallback']);
+
+// API UNTUK FORM BOOKING (Sudah Benar)
 Route::prefix('api')->group(function () {
-
-    // Rute 1 (SUDAH BENAR)
     Route::get('/psikologs-by-service', [\App\Http\Controllers\Api\BookingController::class, 'getPsikologsByService']);
-
-    // Rute 2 (INI YANG HARUS DIPERBAIKI)
-    Route::get('/available-times', [\App\Http\Controllers\Api\BookingController::class, 'getAvailableTimes']); // <-- PASTIKAN INI 'getAvailableTimes'
-
+    Route::get('/available-times', [\App\Http\Controllers\Api\BookingController::class, 'getAvailableTimes']);
 });
-// --------------------------------------------------------------------------
-// GROUP RUTE PSIKOLOG (Contoh dari kode kamu yang di-comment)
-// --------------------------------------------------------------------------
-// Route::middleware(['auth', 'role:psikolog'])->prefix('psikolog')->name('psikolog.')->group(function () {
-//     Route::get('/dashboard', [PsikologController::class, 'dashboard'])->name('dashboard');
-//     Route::get('/sessions', [PsikologController::class, 'mySessions'])->name('sessions');
-// });
+
+require __DIR__.'/auth.php';
