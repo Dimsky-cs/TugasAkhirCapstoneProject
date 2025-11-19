@@ -1,162 +1,205 @@
 <x-app-layout>
-    <div class="bg-gray-100 min-h-screen">
+    <div class="bg-gray-100 min-h-screen pb-12">
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-                <!-- Salam Pembuka -->
+                <!-- Header -->
                 <div class="mb-8">
                     <h2 class="text-3xl font-bold text-gray-800">Selamat Datang, {{ Auth::user()->name }}!</h2>
-                    <p class="text-gray-500">Berikut adalah ringkasan aktivitas di Gen-z Psychology.</p>
+                    <p class="text-gray-500">Ringkasan aktivitas platform hari ini.</p>
                 </div>
 
-                <!-- [UPDATE] 5 KARTU STATS -->
-                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8">
-                    <!-- Total Pengguna (User) -->
-                    <div class="bg-white p-6 rounded-2xl shadow-lg flex items-center space-x-4">
-                        <div class="p-3 rounded-full bg-blue-100 text-blue-600">
-                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.003c0 1.113.285 2.16.786 3.07M15 19.128H6.84a4.125 4.125 0 01-7.533-2.493 4.125 4.125 0 017.533 2.493H3.356c1.113 0 2.16.285 3.07.786v.003z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">Total Klien (User)</p>
-                            <p class="text-3xl font-bold text-gray-900">{{ $stats['totalPengguna'] }}</p>
-                        </div>
-                    </div>
-                    <!-- Total Psikolog -->
-                    <div class="bg-white p-6 rounded-2xl shadow-lg flex items-center space-x-4">
-                        <div class="p-3 rounded-full bg-purple-100 text-purple-600">
-                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">Total Psikolog</p>
-                            <p class="text-3xl font-bold text-gray-900">{{ $stats['totalPsikolog'] }}</p>
+                <!-- 1. STAT CARDS (Grid 5 Kolom) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+                    <!-- User -->
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                        <div class="flex items-center space-x-3">
+                            <div class="p-3 bg-blue-100 text-blue-600 rounded-lg">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase font-bold">Klien</p>
+                                <p class="text-2xl font-extrabold text-gray-800">{{ $stats['totalPengguna'] }}</p>
+                            </div>
                         </div>
                     </div>
-                    <!-- Total Booking -->
-                    <div class="bg-white p-6 rounded-2xl shadow-lg flex items-center space-x-4">
-                        <div class="p-3 rounded-full bg-green-100 text-green-600">
-                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">Total Booking</p>
-                            <p class="text-3xl font-bold text-gray-900">{{ $stats['totalBooking'] }}</p>
-                        </div>
-                    </div>
-                    <!-- Booking Pending -->
-                    <div class="bg-white p-6 rounded-2xl shadow-lg flex items-center space-x-4">
-                        <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
-                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">Booking Pending</p>
-                            <p class="text-3xl font-bold text-gray-900">{{ $stats['bookingPending'] }}</p>
+
+                    <!-- Psikolog -->
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                        <div class="flex items-center space-x-3">
+                            <div class="p-3 bg-purple-100 text-purple-600 rounded-lg">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase font-bold">Psikolog</p>
+                                <p class="text-2xl font-extrabold text-gray-800">{{ $stats['totalPsikolog'] }}</p>
+                            </div>
                         </div>
                     </div>
-                    <!-- Sesi Selesai -->
-                    <div class="bg-white p-6 rounded-2xl shadow-lg flex items-center space-x-4">
-                        <div class="p-3 rounded-full bg-pink-100 text-pink-600">
-                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
+
+                    <!-- Booking Total -->
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                        <div class="flex items-center space-x-3">
+                            <div class="p-3 bg-green-100 text-green-600 rounded-lg">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                                    </path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase font-bold">Total Sesi</p>
+                                <p class="text-2xl font-extrabold text-gray-800">{{ $stats['totalBooking'] }}</p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">Sesi Selesai</p>
-                            <p class="text-3xl font-bold text-gray-900">{{ $stats['sesiSelesai'] }}</p>
+                    </div>
+
+                    <!-- Pending -->
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                        <div class="flex items-center space-x-3">
+                            <div class="p-3 bg-yellow-100 text-yellow-600 rounded-lg">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase font-bold">Pending</p>
+                                <p class="text-2xl font-extrabold text-gray-800">{{ $stats['bookingPending'] }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Selesai -->
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                        <div class="flex items-center space-x-3">
+                            <div class="p-3 bg-pink-100 text-pink-600 rounded-lg">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase font-bold">Selesai</p>
+                                <p class="text-2xl font-extrabold text-gray-800">{{ $stats['sesiSelesai'] }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- [BARU] VISUALISASI DATA (CHARTS) -->
-                <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-8">
-                    <!-- Line Chart (Tren Booking) -->
-                    <div class="lg:col-span-3 bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 class="text-xl font-bold text-gray-800 mb-4">Tren Booking (7 Hari Terakhir)</h3>
-                        <canvas id="bookingTrendChart"></canvas>
+                <!-- 2. SECTION CHARTS (GRID LAYOUT) -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+
+                    <!-- Chart 1: Tren Booking (Line) -->
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                            <span class="w-2 h-6 bg-indigo-500 rounded-full mr-2"></span>
+                            Tren Booking (7 Hari)
+                        </h3>
+                        <div class="relative h-64">
+                            <canvas id="bookingTrendChart"></canvas>
+                        </div>
                     </div>
-                    <!-- Pie Chart (Layanan Populer) -->
-                    <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 class="text-xl font-bold text-gray-800 mb-4">Layanan Terpopuler</h3>
-                        <canvas id="layananChart"></canvas>
+
+                    <!-- Chart 2: Layanan Populer (Doughnut - Lebih Modern dari Pie) -->
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                            <span class="w-2 h-6 bg-pink-500 rounded-full mr-2"></span>
+                            Kategori Masalah Terpopuler
+                        </h3>
+                        <div class="relative h-64 flex justify-center">
+                            <canvas id="layananChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Chart 3: Metode Sesi (Bar Horizontal) -->
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                            <span class="w-2 h-6 bg-green-500 rounded-full mr-2"></span>
+                            Metode Konseling Favorit
+                        </h3>
+                        <div class="relative h-64">
+                            <canvas id="methodChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Chart 4: Hari Tersibuk (Bar Vertical) -->
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                            <span class="w-2 h-6 bg-orange-500 rounded-full mr-2"></span>
+                            Hari Paling Sibuk
+                        </h3>
+                        <div class="relative h-64">
+                            <canvas id="dayChart"></canvas>
+                        </div>
                     </div>
                 </div>
 
-
-                <!-- Tabel "Jadwal Perlu Konfirmasi" (Sama seperti sebelumnya) -->
-                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="p-6 flex justify-between items-center border-b">
-                        <h3 class="text-xl font-bold text-gray-800">Jadwal Konseling Perlu Konfirmasi</h3>
+                <!-- 3. TABEL DATA TERBARU -->
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                    <div class="p-6 flex justify-between items-center border-b border-gray-100 bg-gray-50">
+                        <h3 class="text-lg font-bold text-gray-800">Menunggu Konfirmasi Terbaru</h3>
                         <a href="{{ route('admin.konseling.index') }}"
-                            class="text-sm font-medium text-indigo-600 hover:text-indigo-500">Lihat Semua Jadwal
-                            &rarr;</a>
+                            class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Lihat Semua &rarr;</a>
                     </div>
                     <div class="overflow-x-auto">
-                        @if ($konselingsPending->isEmpty())
-                            <p class="p-6 text-gray-500 text-center">Tidak ada jadwal yang perlu dikonfirmasi saat ini.
-                            </p>
-                        @else
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-white">
+                                <tr>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Klien</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Psikolog</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Jadwal</th>
+                                    <th
+                                        class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @forelse ($konselingsPending as $booking)
                                     <tr>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Klien</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Psikolog</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Jadwal Diajukan</th>
-                                        <th
-                                            class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Aksi</th>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-bold text-gray-900">{{ $booking->client_name }}
+                                            </div>
+                                            <div class="text-xs text-gray-500">{{ $booking->service_type }}</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                            {{ $booking->psikolog->name ?? '-' }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900">
+                                                {{ \Carbon\Carbon::parse($booking->consultation_date)->isoFormat('D MMM') }}
+                                            </div>
+                                            <div class="text-xs text-gray-500">
+                                                {{ \Carbon\Carbon::parse($booking->consultation_time)->format('H:i') }}
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <a href="{{ route('admin.konseling.edit', $booking->id) }}"
+                                                class="text-indigo-600 hover:text-indigo-900">Detail</a>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    @foreach ($konselingsPending as $booking)
-                                        <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm font-medium text-gray-900">
-                                                    {{ $booking->client_name }}</div>
-                                                <div class="text-sm text-gray-500">{{ $booking->service_type }}</div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm text-gray-900">
-                                                    {{ $booking->psikolog->name ?? 'N/A' }}</div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm text-gray-900">
-                                                    {{ \Carbon\Carbon::parse($booking->consultation_date)->isoFormat('D MMM Y') }}
-                                                </div>
-                                                <div class="text-sm text-gray-500">
-                                                    {{ \Carbon\Carbon::parse($booking->consultation_time)->format('H:i') }}
-                                                    WIB</div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <a href="{{ route('admin.konseling.edit', $booking->id) }}"
-                                                    class="text-indigo-600 hover:text-indigo-900">Lihat Detail</a>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        @endif
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="px-6 py-8 text-center text-gray-500 italic">Tidak
+                                            ada jadwal pending saat ini.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -164,65 +207,134 @@
         </div>
     </div>
 
-    <!-- [BARU] SCRIPT UNTUK MENJALANKAN CHARTS -->
+    <!-- SCRIPT CHART.JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-            // --- Chart 1: Tren Booking (Line Chart) ---
-            const bookingCtx = document.getElementById('bookingTrendChart');
-            if (bookingCtx) {
-                new Chart(bookingCtx, {
-                    type: 'line',
-                    data: {
-                        labels: @json($chartBookingLabels),
-                        datasets: [{
-                            label: 'Jumlah Booking',
-                            data: @json($chartBookingData),
-                            borderColor: 'rgb(79, 70, 229)', // Indigo-600
-                            backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                            fill: true,
-                            tension: 0.3
-                        }]
+            // --- CONFIG UMUM (Agar Chart Rapi) ---
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#64748b';
+
+            // --- CHART 1: TREN BOOKING (Area Chart) ---
+            new Chart(document.getElementById('bookingTrendChart'), {
+                type: 'line',
+                data: {
+                    labels: @json($chartBookingLabels),
+                    datasets: [{
+                        label: 'Jumlah Booking',
+                        data: @json($chartBookingData),
+                        borderColor: '#6366f1', // Indigo
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4 // Membuat garis melengkung halus
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
                     },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    // Hanya tampilkan angka bulat (1, 2, 3... bukan 1.5)
-                                    precision: 0
-                                }
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                borderDash: [2, 4]
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
                             }
                         }
                     }
-                });
-            }
+                }
+            });
 
-            // --- Chart 2: Layanan Populer (Pie Chart) ---
-            const layananCtx = document.getElementById('layananChart');
-            if (layananCtx) {
-                new Chart(layananCtx, {
-                    type: 'pie',
-                    data: {
-                        labels: @json($chartLayananLabels),
-                        datasets: [{
-                            label: 'Jumlah Sesi',
-                            data: @json($chartLayananData),
-                            backgroundColor: [
-                                'rgb(236, 72, 153)', // Pink-500
-                                'rgb(34, 197, 94)', // Green-500
-                                'rgb(168, 85, 247)', // Purple-500
-                                'rgb(234, 179, 8)', // Yellow-500
-                            ],
-                            hoverOffset: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
+            // --- CHART 2: LAYANAN (Doughnut Chart) ---
+            new Chart(document.getElementById('layananChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: @json($chartLayananLabels),
+                    datasets: [{
+                        data: @json($chartLayananData),
+                        backgroundColor: ['#ec4899', '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%', // Membuat lubang tengah lebih besar
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
                     }
-                });
-            }
+                }
+            });
+
+            // --- CHART 3: METODE FAVORIT (Horizontal Bar) ---
+            new Chart(document.getElementById('methodChart'), {
+                type: 'bar',
+                data: {
+                    labels: @json($chartMethodLabels),
+                    datasets: [{
+                        label: 'Peminat',
+                        data: @json($chartMethodData),
+                        backgroundColor: '#10b981', // Emerald Green
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // Membuat Bar jadi Horizontal
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // --- CHART 4: HARI TERSIBUK (Vertical Bar) ---
+            new Chart(document.getElementById('dayChart'), {
+                type: 'bar',
+                data: {
+                    labels: @json($chartDayLabels),
+                    datasets: [{
+                        label: 'Total Sesi',
+                        data: @json($chartDayData),
+                        backgroundColor: '#f97316', // Orange
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
         });
     </script>
 </x-app-layout>

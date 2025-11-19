@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\KonselingController as AdminKonselingController;
 use App\Http\Controllers\SocialLoginController;
 use App\Http\Controllers\PsikologController;
 use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,6 +56,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // [BARU] RUTE MANAJEMEN USER (CRUD)
     Route::resource('users', UserManagementController::class)->except(['show']);
+
+    Route::get('/export/pdf', [ReportController::class, 'exportPDF'])->name('export.pdf');
+Route::get('/export/excel', [ReportController::class, 'exportExcel'])->name('export.excel');
 });
 
 // --- GRUP UNTUK USER (KLIEN) ---
@@ -67,6 +71,10 @@ Route::middleware(['auth', 'role:user'])->prefix('user')->name('user.')->group(f
     Route::get('/konseling', [KonselingController::class, 'index'])->name('konseling.index');
     Route::get('/konseling/create', [KonselingController::class, 'create'])->name('konseling.create');
     Route::post('/konseling', [KonselingController::class, 'store'])->name('konseling.store');
+    Route::get('/konseling/{konseling}/review', [KonselingController::class, 'showReviewForm'])->name('konseling.review');
+    Route::post('/konseling/{konseling}/review', [KonselingController::class, 'storeReview'])->name('konseling.storeReview');
+Route::get('/export/pdf', [ReportController::class, 'exportPDF'])->name('export.pdf');
+Route::get('/export/excel', [ReportController::class, 'exportExcel'])->name('export.excel');
 });
 
 // --- [BARU] GRUP UNTUK PSIKOLOG ---
@@ -74,6 +82,8 @@ Route::middleware(['auth', 'role:psikolog'])->prefix('psikolog')->name('psikolog
     Route::get('/dashboard', [PsikologController::class, 'index'])->name('dashboard');
     Route::get('/sesi/{konseling}/edit', [PsikologController::class, 'edit'])->name('sesi.edit');
     Route::patch('/sesi/{konseling}', [PsikologController::class, 'update'])->name('sesi.update');
+    Route::get('/export/pdf', [ReportController::class, 'exportPDF'])->name('export.pdf');
+Route::get('/export/excel', [ReportController::class, 'exportExcel'])->name('export.excel');
 });
 
 

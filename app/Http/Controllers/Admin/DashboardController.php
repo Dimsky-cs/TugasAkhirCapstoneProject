@@ -5,74 +5,82 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Konseling;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB; // <-- [PENTING] Tambahkan ini
-use Carbon\Carbon; // <-- [PENTING] Tambahkan ini
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // --- 1. LOGIKA STAT CARDS (5 KARTU) ---
-        $totalPengguna = User::where('role', 'user')->count();
-        $totalPsikolog = User::where('role', 'psikolog')->count(); // <-- KARTU BARU
-        $totalBooking = Konseling::count();
-        $bookingPending = Konseling::where('status', 'pending')->count();
-        $sesiSelesai = Konseling::where('status', 'completed')->count();
-
-        // Kumpulkan data stats
+        // --- 1. STAT CARDS ---
         $stats = [
-            'totalPengguna' => $totalPengguna,
-            'totalPsikolog' => $totalPsikolog,
-            'totalBooking' => $totalBooking,
-            'bookingPending' => $bookingPending,
-            'sesiSelesai' => $sesiSelesai,
+            'totalPengguna' => User::where('role', 'user')->count(),
+            'totalPsikolog' => User::where('role', 'psikolog')->count(),
+            'totalBooking' => Konseling::count(),
+            'bookingPending' => Konseling::where('status', 'pending')->count(),
+            'sesiSelesai' => Konseling::where('status', 'completed')->count(),
         ];
 
-        // --- 2. LOGIKA TABEL "PERLU KONFIRMASI" (Sama seperti sebelumnya) ---
+        // --- 2. TABEL PENDING (5 Terbaru) ---
         $konselingsPending = Konseling::with('user', 'psikolog')
             ->where('status', 'pending')
             ->orderBy('created_at', 'asc')
-            ->limit(5) // Ambil 5 terbaru
+            ->limit(5)
             ->get();
 
-
-        // --- 3. [BARU] LOGIKA CHART TREN BOOKING (7 HARI TERAKHIR) ---
-        $bookingData = Konseling::select(
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('count(*) as total')
-            )
+        // --- 3. CHART 1: TREN BOOKING (Line Chart) ---
+        // Mengambil data 7 hari terakhir
+        $bookingData = Konseling::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
             ->where('created_at', '>=', Carbon::now()->subDays(7))
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get();
 
-        // Siapkan array untuk chart
-        $chartBookingLabels = $bookingData->pluck('date')->map(function ($date) {
-            return Carbon::parse($date)->format('d M'); // Format: "14 Nov"
-        });
+        $chartBookingLabels = $bookingData->map(fn($item) => Carbon::parse($item->date)->format('d M'));
         $chartBookingData = $bookingData->pluck('total');
 
-
-        // --- 4. [BARU] LOGIKA CHART LAYANAN POPULER (PIE CHART) ---
+        // --- 4. CHART 2: LAYANAN TERPOPULER (Pie Chart) ---
         $layananData = Konseling::select('service_type', DB::raw('count(*) as total'))
             ->groupBy('service_type')
             ->get();
 
-        $chartLayananLabels = $layananData->pluck('service_type')->map(function ($layanan) {
-            return ucfirst($layanan); // Format: "Karier", "Stres"
-        });
+        $chartLayananLabels = $layananData->pluck('service_type')->map(fn($val) => ucfirst($val));
         $chartLayananData = $layananData->pluck('total');
 
+        // --- [BARU] CHART 3: METODE SESI FAVORIT (Bar Chart Horizontal) ---
+        // Menghitung Video Call vs Chat vs Voice Call
+        $methodData = Konseling::select('session_preference', DB::raw('count(*) as total'))
+            ->whereNotNull('session_preference')
+            ->groupBy('session_preference')
+            ->orderByDesc('total')
+            ->get();
 
-        // --- 5. KIRIM SEMUA DATA KE VIEW ---
+        $chartMethodLabels = $methodData->pluck('session_preference');
+        $chartMethodData = $methodData->pluck('total');
+
+        // --- [BARU] CHART 4: HARI TERSIBUK (Column/Bar Chart Vertical) ---
+        // Melihat hari apa yang paling banyak jadwal konselingnya
+        $dayData = Konseling::select(DB::raw('DAYNAME(consultation_date) as day'), DB::raw('count(*) as total'))
+            ->groupBy('day')
+            // Trik MySQL untuk mengurutkan hari Senin s/d Minggu
+            ->orderByRaw("FIELD(day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')")
+            ->get();
+
+        // Translate hari ke Indonesia (Opsional, manual mapping agar rapi)
+        $indoDays = [
+            'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu',
+            'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu', 'Sunday' => 'Minggu'
+        ];
+
+        $chartDayLabels = $dayData->map(fn($item) => $indoDays[$item->day] ?? $item->day);
+        $chartDayData = $dayData->pluck('total');
+
         return view('admin.dashboard', compact(
-            'stats',
-            'konselingsPending',
-            'chartBookingLabels',
-            'chartBookingData',
-            'chartLayananLabels',
-            'chartLayananData'
+            'stats', 'konselingsPending',
+            'chartBookingLabels', 'chartBookingData',
+            'chartLayananLabels', 'chartLayananData',
+            'chartMethodLabels', 'chartMethodData',
+            'chartDayLabels', 'chartDayData'
         ));
     }
 }

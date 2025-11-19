@@ -4,32 +4,58 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Konseling;
-use App\Models\User; // <-- TAMBAHAN: Kita butuh model User
+use App\Models\User; // <-- [PENTING] Pastikan ini ada
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail; // (Jika kamu skip email, ini tidak apa-apa)
+use App\Mail\BookingConfirmed; // (Jika kamu skip email, ini tidak apa-apa)
 
 class KonselingController extends Controller
 {
     /**
      * READ: Menampilkan daftar semua data konseling.
-     */
-    public function index()
+    */
+    public function index(Request $request)
     {
-        // Ambil data konseling, DAN data relasi 'user' dan 'psikolog'
-        // Ini akan mencegah N+1 Query (lebih efisien)
-        $konselings = Konseling::with(['user', 'psikolog'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $search = $request->input('search');
+        $sortBy = $request->input('sort_by', 'created_at');
+        $sortDir = $request->input('sort_direction', 'desc');
+
+        $query = Konseling::with(['user', 'psikolog']);
+
+        // Search (Bisa cari nama Klien ATAU nama Psikolog)
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->whereHas('user', function($u) use ($search) {
+                    $u->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('psikolog', function($p) use ($search) {
+                    $p->where('name', 'like', "%{$search}%");
+                })
+                ->orWhere('status', 'like', "%{$search}%");
+            });
+        }
+
+        // Sorting
+        $allowedSorts = ['created_at', 'consultation_date', 'status'];
+        if (in_array($sortBy, $allowedSorts)) {
+            $query->orderBy($sortBy, $sortDir);
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $konselings = $query->paginate(10)->appends($request->all());
 
         return view('admin.konseling.index', compact('konselings'));
     }
 
     /**
      * CREATE: Menampilkan form untuk membuat data baru.
+     * [INI BAGIAN YANG DIPERBAIKI]
      */
     public function create()
     {
         $users = User::where('role', 'user')->get(); // Ambil daftar user
-        //$psikologs = User::where('role', 'psikolog')->get(); // Ambil daftar psikolog
+        $psikologs = User::where('role', 'psikolog')->get(); // <-- INI YANG HILANG
 
         return view('admin.konseling.create', compact('users', 'psikologs'));
     }
@@ -63,17 +89,19 @@ class KonselingController extends Controller
             return back()->withErrors(['consultation_date' => 'Jadwal pada tanggal dan jam ini dengan psikolog tersebut sudah terisi.'])->withInput();
         }
 
-        Konseling::create($validated);
+        $konseling = Konseling::create($validated);
+
+        // (Logika email notifikasi akan ada di sini nanti)
 
         return redirect()->route('admin.konseling.index')->with('success', 'Jadwal konseling baru berhasil ditambahkan.');
     }
 
     /**
      * EDIT: Menampilkan form untuk mengedit data.
+     * [INI JUGA PENTING]
      */
     public function edit(Konseling $konseling)
     {
-        // Ambil daftar user & psikolog untuk dropdown
         $users = User::where('role', 'user')->get();
         $psikologs = User::where('role', 'psikolog')->get();
 
@@ -90,7 +118,6 @@ class KonselingController extends Controller
             'psikolog_id' => 'nullable|exists:users,id',
             'session_preference' => 'required|string|in:Video Call,Voice Call,Chat Saja',
             'client_name' => 'required|string|max:255',
-            'client_name' => 'required|string|max:255',
             'client_email' => 'required|email|max:255',
             'client_phone' => 'required|string|max:20',
             'service_type' => 'required|string|max:255',
@@ -100,7 +127,7 @@ class KonselingController extends Controller
             'status' => 'required|in:pending,confirmed,completed,cancelled',
         ]);
 
-        // Cek jadwal bentrok, kecuali untuk jadwal yang sedang diedit itu sendiri
+        // Cek jadwal bentrok
         $existingBooking = Konseling::where('psikolog_id', $validated['psikolog_id'])
             ->where('consultation_date', $validated['consultation_date'])
             ->where('consultation_time', $validated['consultation_time'])
@@ -113,6 +140,8 @@ class KonselingController extends Controller
 
         $konseling->update($validated);
 
+        // (Logika email notifikasi akan ada di sini nanti)
+
         return redirect()->route('admin.konseling.index')->with('success', 'Data konseling berhasil diperbarui.');
     }
 
@@ -124,4 +153,8 @@ class KonselingController extends Controller
         $konseling->delete();
         return redirect()->route('admin.konseling.index')->with('success', 'Data konseling berhasil dihapus.');
     }
+
+
+
+
 }

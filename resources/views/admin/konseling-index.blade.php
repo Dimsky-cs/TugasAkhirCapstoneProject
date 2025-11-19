@@ -7,7 +7,7 @@
 
     <div class="py-12 max-w-6xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white p-6 shadow-sm sm:rounded-lg">
-            @if($konselings->isEmpty())
+            @if ($konselings->isEmpty())
                 <p>Belum ada pengajuan konseling dari user.</p>
             @else
                 <table class="w-full border-collapse">
@@ -21,7 +21,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($konselings as $k)
+                        @foreach ($konselings as $k)
                             <tr>
                                 <td class="border px-4 py-2">{{ $loop->iteration }}</td>
                                 <td class="border px-4 py-2">{{ $k->user->name }}</td>
