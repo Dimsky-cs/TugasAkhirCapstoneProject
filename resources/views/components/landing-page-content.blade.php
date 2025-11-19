@@ -45,66 +45,78 @@ File "Master" Landing Page
     </div>
 </section>
 
-{{-- [PERUBAHAN BESAR DI SINI] --}}
+{{-- [PERUBAHAN BESAR DI SINI: TENTANG KAMI] --}}
 <section id="tentang" class="py-20 bg-white scroll-mt-16">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-        {{-- 1. Paragraf "Tentang" Dibuat Lebih Jelas --}}
-        <div class="max-w-4xl mx-auto text-center">
+        {{-- 1. Intro Tentang Kami --}}
+        <div class="max-w-4xl mx-auto text-center mb-16">
             <h2 class="text-4xl font-bold text-gray-800">Tentang <span class="text-pink-500">Gen-Z</span> Psychology
             </h2>
             <p class="text-lg text-gray-600 mt-6 leading-relaxed">
-                Gen-Z Psychology lahir dari sebuah keresahan: membicarakan kesehatan mental seringkali masih terasa
-                sulit, tabu, atau diabaikan. Kami percaya bahwa merasa cemas, burnout, atau bingung adalah hal yang
-                valid dan manusiawi.
+                Gen-Z Psychology lahir dari sebuah keyakinan bahwa kesehatan mental adalah bagian tak terpisahkan dari
+                kesejahteraan hidup. Kami memahami bahwa generasi masa kini menghadapi tantangan unik—mulai dari tekanan
+                digital, karir yang dinamis, hingga pencarian jati diri.
             </p>
             <p class="text-lg text-gray-600 mt-4 leading-relaxed">
-                Misi kami adalah menyediakan ruang aman yang profesional, mudah diakses, dan non-judgmental (tidak
-                menghakimi) bagi siapa saja terutama kamu untuk bertumbuh, pulih, dan lebih memahami diri sendiri.
+                Kami hadir bukan hanya sebagai penyedia layanan, tetapi sebagai <strong>teman perjalanan</strong>. Misi
+                kami adalah mendemokratisasi akses ke bantuan profesional, menghapus stigma, dan menciptakan ekosistem
+                di mana setiap perasaan divalidasi.
             </p>
         </div>
 
-        {{-- 2. Cerita Founder (Revisi Total) --}}
-        <div class="mt-20 max-w-4xl mx-auto">
-            <h3 class="text-3xl font-bold text-center mb-6 text-green-500">Cerita di Balik Layar</h3>
-            <p class="text-center text-gray-600 max-w-3xl mx-auto mb-12 text-lg">
-                Platform ini didirikan oleh Dimas Smeichel Maliseono (CEO) dan Alfian Nurshanbani(Co-Founder).
-                Berawal dari keresahan bersama melihat banyaknya teman sebaya yang kesulitan menemukan dukungan
-                kesehatan mental yang relate dan terjangkau, mereka menggabungkan keahlian di bidang psikologi dan
-                teknologi untuk membangun Gen-Z Psychology.
-            </p>
-
-            {{-- 3. Grid diubah jadi 2 kolom & dihapus 2 orang --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-start">
-
-                <!-- Tim Anggota 1 (Dimas) -->
-                <div class="text-center p-4">
-                    <img class="w-40 h-40 rounded-full mx-auto mb-4 shadow-lg transform hover:scale-110 transition-transform object-cover"
-                        src="{{ asset('dimas.png') }}" alt="Foto Dimas Smeichel Maliseono">
-                    <h4 class="text-xl font-bold text-gray-800">Dimas Smeichel Maliseono</h4>
-                    <p class="text-gray-500 font-semibold">Founder, CEO & Psikolog</p>
-                    {{-- Paragraf personal dihapus --}}
+        {{-- 2. Nilai Utama (Core Values) - MENGGANTIKAN PROFIL FOUNDER --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <!-- Value 1 -->
+            <div class="p-8 bg-pink-50 rounded-3xl hover:shadow-xl transition duration-300 border border-pink-100">
+                <div
+                    class="w-16 h-16 mx-auto bg-white text-pink-500 rounded-full flex items-center justify-center mb-6 text-3xl shadow-sm">
+                    🤝
                 </div>
+                <h4 class="text-2xl font-bold text-gray-800 mb-3">Ruang Aman & Inklusif</h4>
+                <p class="text-gray-600 leading-relaxed">
+                    Kami menyediakan lingkungan <em>non-judgmental</em>. Siapapun kamu, apapun latar belakangmu,
+                    ceritamu
+                    aman bersama kami. Kerahasiaan adalah prioritas utama.
+                </p>
+            </div>
 
-                <!-- Tim Anggota 2 (Pascalis) -->
-                <div class="text-center p-4">
-                    <img class="w-40 h-40 rounded-full mx-auto mb-4 shadow-lg transform hover:scale-110 transition-transform object-cover"
-                        src="{{ asset('alfian.jpg') }}" alt="Foto Alfian Nurshabani">
-                    <h4 class="text-xl font-bold text-gray-800">Alfian Nurshabani</h4>
-                    <p class="text-gray-500 font-semibold">Co-Founder, Head of Product & Psikolog</p>
-                    {{-- Paragraf personal dihapus --}}
+            <!-- Value 2 -->
+            <div class="p-8 bg-green-50 rounded-3xl hover:shadow-xl transition duration-300 border border-green-100">
+                <div
+                    class="w-16 h-16 mx-auto bg-white text-green-600 rounded-full flex items-center justify-center mb-6 text-3xl shadow-sm">
+                    🧠
                 </div>
+                <h4 class="text-2xl font-bold text-gray-800 mb-3">Profesional & Terpercaya</h4>
+                <p class="text-gray-600 leading-relaxed">
+                    Seluruh mitra psikolog kami memiliki lisensi resmi dan berpengalaman menangani isu-isu relevan
+                    seperti
+                    <em>burnout</em>, <em>quarter-life crisis</em>, hingga trauma.
+                </p>
+            </div>
+
+            <!-- Value 3 -->
+            <div class="p-8 bg-blue-50 rounded-3xl hover:shadow-xl transition duration-300 border border-blue-100">
+                <div
+                    class="w-16 h-16 mx-auto bg-white text-blue-500 rounded-full flex items-center justify-center mb-6 text-3xl shadow-sm">
+                    🚀
+                </div>
+                <h4 class="text-2xl font-bold text-gray-800 mb-3">Akses Mudah & Fleksibel</h4>
+                <p class="text-gray-600 leading-relaxed">
+                    Kesehatan mental tidak boleh ribet. Dengan teknologi kami, kamu bisa menjadwalkan sesi konseling,
+                    memilih metode (Video/Chat), dan konsultasi dari mana saja.
+                </p>
             </div>
         </div>
+
     </div>
 </section>
-{{-- [AKHIR PERUBAHAN] --}}
 
-{{-- [PERUBAHAN BAHASA & IKON DI SINI] --}}
+{{-- BAGIAN LAYANAN --}}
 <section id="layanan" class="py-20 bg-gradient-to-br from-pink-50 via-white to-green-50 scroll-mt-16">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-        <!-- [BAGIAN BARU] Penjelasan "Ngapain Aja Sih?" -->
+        <!-- Penjelasan Proses -->
         <div class="text-center mb-16">
             <h2 class="text-4xl font-bold text-gray-800">Gimana Sesi Konseling di Sini?</h2>
             <p class="text-gray-600 max-w-2xl mx-auto mt-4 text-lg">
@@ -116,7 +128,6 @@ File "Master" Landing Page
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20 max-w-5xl mx-auto">
             <!-- Step 1 Card -->
             <div class="how-it-works-card">
-                {{-- [IKON DIKEMBALIKAN] --}}
                 <svg class="how-it-works-card-icon text-pink-500" xmlns="http://www.w3.org/2000/svg" fill="none"
                     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -130,7 +141,6 @@ File "Master" Landing Page
             </div>
             <!-- Step 2 Card -->
             <div class="how-it-works-card">
-                {{-- [IKON DIKEMBALIKAN] --}}
                 <svg class="how-it-works-card-icon text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"
                     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -144,7 +154,6 @@ File "Master" Landing Page
             </div>
             <!-- Step 3 Card -->
             <div class="how-it-works-card">
-                {{-- [IKON DIKEMBALIKAN] --}}
                 <svg class="how-it-works-card-icon text-pink-500" xmlns="http://www.w3.org/2000/svg" fill="none"
                     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -153,22 +162,18 @@ File "Master" Landing Page
                 </svg>
                 <h3 class="how-it-works-card-title">3. Dapatkan Solusi Praktis</h3>
                 <p class="how-it-works-card-text">
-                    kamu tidak hanya bercerita. Kamu akan pulang dengan strategi dan cara-cara baru yang praktis untuk
+                    Kamu tidak hanya bercerita. Kamu akan pulang dengan strategi dan cara-cara baru yang praktis untuk
                     menghadapi tantangan di masa depan.
                 </p>
             </div>
         </div>
-        <!-- [AKHIR BAGIAN BARU] -->
 
-
-        <!-- [BAGIAN LAMA - Ganti Judul & Teks] -->
         <h2 class="text-4xl font-bold text-center mb-12">Topik yang Sering Dibahas</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
             <!-- Kartu 1: Konseling Karier -->
             <div class="service-card">
                 <div class="mx-auto mb-6 bg-green-100 p-4 rounded-full">
-                    {{-- [IKON DIKEMBALIKAN] --}}
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-600" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -183,7 +188,6 @@ File "Master" Landing Page
             <!-- Kartu 2: Konseling Stres -->
             <div class="service-card">
                 <div class="mx-auto mb-6 bg-pink-100 p-4 rounded-full">
-                    {{-- [IKON DIKEMBALIKAN] --}}
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-pink-600" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -198,7 +202,6 @@ File "Master" Landing Page
             <!-- Kartu 3: Konseling Hubungan -->
             <div class="service-card">
                 <div class="mx-auto mb-6 bg-pink-100 p-4 rounded-full">
-                    {{-- [IKON DIKEMBALIKAN] --}}
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-pink-600" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -213,7 +216,6 @@ File "Master" Landing Page
             <!-- Kartu 4: Konseling Kecemasan -->
             <div class="service-card">
                 <div class="mx-auto mb-6 bg-green-100 p-4 rounded-full">
-                    {{-- [IKON DIKEMBALIKAN] --}}
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-600" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -257,7 +259,6 @@ File "Master" Landing Page
             <!-- Kartu Email -->
             <a href="mailto:info@psikologionline.com" class="contact-visual-card">
                 <div class="flex-shrink-0 bg-pink-100 p-4 rounded-2xl">
-                    {{-- [IKON DIKEMBALIKAN] --}}
                     <svg class="h-8 w-8 text-pink-600" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -272,7 +273,6 @@ File "Master" Landing Page
             <!-- Kartu WhatsApp -->
             <a href="https://wa.me/6281234567890" target="_blank" class="contact-visual-card">
                 <div class="flex-shrink-0 bg-green-100 p-4 rounded-2xl">
-                    {{-- [IKON DIKEMBALIKAN - Pakai ikon Telepon] --}}
                     <svg class="h-8 w-8 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -290,7 +290,6 @@ File "Master" Landing Page
         <div class="mt-20 max-w-5xl mx-auto">
             <h3 class="text-3xl font-bold text-center text-gray-800 mb-8">Ikuti Perjalanan Kami</h3>
             <div class="ig-grid">
-                <!-- Gunakan gambar placeholder. Ganti 'text' dengan tema -->
                 <div class="ig-post group">
                     <img src="https://placehold.co/400x400/FADBEA/333?text=Kesehatan+Mental" alt="IG Post 1"
                         loading="lazy">
