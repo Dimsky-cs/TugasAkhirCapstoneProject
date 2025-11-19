@@ -271,7 +271,7 @@ File "Master" Landing Page
                 </div>
             </a>
             <!-- Kartu WhatsApp -->
-            <a href="https://wa.me/6281234567890" target="_blank" class="contact-visual-card">
+            <a href="https://wa.me/6281264676578" target="_blank" class="contact-visual-card">
                 <div class="flex-shrink-0 bg-green-100 p-4 rounded-2xl">
                     <svg class="h-8 w-8 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -281,7 +281,7 @@ File "Master" Landing Page
                 </div>
                 <div class="ml-5">
                     <h3 class="text-lg font-semibold text-gray-900">WhatsApp Kami</h3>
-                    <p class="text-gray-600">+62 812-3456-7890</p>
+                    <p class="text-gray-600">+62 812-6467-6578</p>
                 </div>
             </a>
         </div>
