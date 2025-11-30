@@ -4,25 +4,28 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Konseling;
-use App\Models\User; // <-- [PENTING] Pastikan ini ada
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail; // (Jika kamu skip email, ini tidak apa-apa)
-use App\Mail\BookingConfirmed; // (Jika kamu skip email, ini tidak apa-apa)
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BookingConfirmed;
 
 class KonselingController extends Controller
 {
     /**
-     * READ: Menampilkan daftar semua data konseling.
-    */
+     * READ: Menampilkan daftar semua data konseling dengan Search, Filter, & Sorting.
+     */
     public function index(Request $request)
     {
+        // 1. Ambil Parameter
         $search = $request->input('search');
+        $status = $request->input('status'); // <--- [BARU] Ambil filter status
         $sortBy = $request->input('sort_by', 'created_at');
         $sortDir = $request->input('sort_direction', 'desc');
 
+        // 2. Query Dasar
         $query = Konseling::with(['user', 'psikolog']);
 
-        // Search (Bisa cari nama Klien ATAU nama Psikolog)
+        // 3. Logika Search
         if ($search) {
             $query->where(function($q) use ($search) {
                 $q->whereHas('user', function($u) use ($search) {
@@ -35,34 +38,34 @@ class KonselingController extends Controller
             });
         }
 
-        // Sorting
-        $allowedSorts = ['created_at', 'consultation_date', 'status'];
+        // 4. [BARU] Logika Filter Status
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        // 5. Logika Sorting
+        $allowedSorts = ['created_at', 'consultation_date', 'status', 'user_id'];
         if (in_array($sortBy, $allowedSorts)) {
             $query->orderBy($sortBy, $sortDir);
         } else {
             $query->orderBy('created_at', 'desc');
         }
 
+        // 6. Pagination (Append agar filter tidak hilang saat pindah halaman)
         $konselings = $query->paginate(10)->appends($request->all());
 
         return view('admin.konseling.index', compact('konselings'));
     }
 
-    /**
-     * CREATE: Menampilkan form untuk membuat data baru.
-     * [INI BAGIAN YANG DIPERBAIKI]
-     */
+    // ... (Method create, store, edit, update, destroy TETAP SAMA, tidak perlu diubah) ...
+
     public function create()
     {
-        $users = User::where('role', 'user')->get(); // Ambil daftar user
-        $psikologs = User::where('role', 'psikolog')->get(); // <-- INI YANG HILANG
-
+        $users = User::where('role', 'user')->get();
+        $psikologs = User::where('role', 'psikolog')->get();
         return view('admin.konseling.create', compact('users', 'psikologs'));
     }
 
-    /**
-     * STORE: Menyimpan data baru dari form create ke database.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -79,7 +82,6 @@ class KonselingController extends Controller
             'status' => 'required|in:pending,confirmed,completed,cancelled',
         ]);
 
-        // Cek jika jadwal sudah ada
         $existingBooking = Konseling::where('psikolog_id', $validated['psikolog_id'])
             ->where('consultation_date', $validated['consultation_date'])
             ->where('consultation_time', $validated['consultation_time'])
@@ -89,28 +91,18 @@ class KonselingController extends Controller
             return back()->withErrors(['consultation_date' => 'Jadwal pada tanggal dan jam ini dengan psikolog tersebut sudah terisi.'])->withInput();
         }
 
-        $konseling = Konseling::create($validated);
-
-        // (Logika email notifikasi akan ada di sini nanti)
+        Konseling::create($validated);
 
         return redirect()->route('admin.konseling.index')->with('success', 'Jadwal konseling baru berhasil ditambahkan.');
     }
 
-    /**
-     * EDIT: Menampilkan form untuk mengedit data.
-     * [INI JUGA PENTING]
-     */
     public function edit(Konseling $konseling)
     {
         $users = User::where('role', 'user')->get();
         $psikologs = User::where('role', 'psikolog')->get();
-
         return view('admin.konseling.edit', compact('konseling', 'users', 'psikologs'));
     }
 
-    /**
-     * UPDATE: Memperbarui data di database.
-     */
     public function update(Request $request, Konseling $konseling)
     {
         $validated = $request->validate([
@@ -127,34 +119,24 @@ class KonselingController extends Controller
             'status' => 'required|in:pending,confirmed,completed,cancelled',
         ]);
 
-        // Cek jadwal bentrok
         $existingBooking = Konseling::where('psikolog_id', $validated['psikolog_id'])
             ->where('consultation_date', $validated['consultation_date'])
             ->where('consultation_time', $validated['consultation_time'])
-            ->where('id', '!=', $konseling->id) // Pengecualian
+            ->where('id', '!=', $konseling->id)
             ->exists();
 
         if ($validated['psikolog_id'] && $existingBooking) {
-            return back()->withErrors(['consultation_date' => 'Jadwal pada tanggal dan jam ini dengan psikolog tersebut sudah terisi oleh booking lain.'])->withInput();
+            return back()->withErrors(['consultation_date' => 'Jadwal bentrok.'])->withInput();
         }
 
         $konseling->update($validated);
 
-        // (Logika email notifikasi akan ada di sini nanti)
-
         return redirect()->route('admin.konseling.index')->with('success', 'Data konseling berhasil diperbarui.');
     }
 
-    /**
-     * DELETE: Menghapus data dari database.
-     */
     public function destroy(Konseling $konseling)
     {
         $konseling->delete();
         return redirect()->route('admin.konseling.index')->with('success', 'Data konseling berhasil dihapus.');
     }
-
-
-
-
 }

@@ -12,7 +12,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // --- 1. STAT CARDS ---
+        // 1. Statistik Utama
         $stats = [
             'totalPengguna' => User::where('role', 'user')->count(),
             'totalPsikolog' => User::where('role', 'psikolog')->count(),
@@ -21,66 +21,55 @@ class DashboardController extends Controller
             'sesiSelesai' => Konseling::where('status', 'completed')->count(),
         ];
 
-        // --- 2. TABEL PENDING (5 Terbaru) ---
+        // 2. Tabel Pending (5 Terbaru)
         $konselingsPending = Konseling::with('user', 'psikolog')
             ->where('status', 'pending')
             ->orderBy('created_at', 'asc')
             ->limit(5)
             ->get();
 
-        // --- 3. CHART 1: TREN BOOKING (Line Chart) ---
-        // Mengambil data 7 hari terakhir
+        // 3. [UPDATE] CHART 1: TREN BOOKING (BULANAN)
+        // Hanya mengambil data di bulan dan tahun saat ini
         $bookingData = Konseling::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
-            ->where('created_at', '>=', Carbon::now()->subDays(7))
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->whereYear('created_at', Carbon::now()->year)
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get();
 
+        // Format label tanggal (contoh: 01 Nov, 02 Nov)
         $chartBookingLabels = $bookingData->map(fn($item) => Carbon::parse($item->date)->format('d M'));
         $chartBookingData = $bookingData->pluck('total');
 
-        // --- 4. CHART 2: LAYANAN TERPOPULER (Pie Chart) ---
+        // 4. Chart Lainnya
         $layananData = Konseling::select('service_type', DB::raw('count(*) as total'))
-            ->groupBy('service_type')
-            ->get();
-
+            ->groupBy('service_type')->get();
         $chartLayananLabels = $layananData->pluck('service_type')->map(fn($val) => ucfirst($val));
         $chartLayananData = $layananData->pluck('total');
 
-        // --- [BARU] CHART 3: METODE SESI FAVORIT (Bar Chart Horizontal) ---
-        // Menghitung Video Call vs Chat vs Voice Call
-        $methodData = Konseling::select('session_preference', DB::raw('count(*) as total'))
-            ->whereNotNull('session_preference')
-            ->groupBy('session_preference')
-            ->orderByDesc('total')
-            ->get();
+        $metodeData = Konseling::select('session_preference', DB::raw('count(*) as total'))
+            ->whereNotNull('session_preference')->groupBy('session_preference')->orderByDesc('total')->get();
+        $chartMetodeLabels = $metodeData->pluck('session_preference');
+        $chartMetodeData = $metodeData->pluck('total');
 
-        $chartMethodLabels = $methodData->pluck('session_preference');
-        $chartMethodData = $methodData->pluck('total');
+        $hariData = Konseling::select(DB::raw('DAYNAME(consultation_date) as day'), DB::raw('count(*) as total'))
+            ->whereNotNull('consultation_date')->groupBy('day')
+            ->orderByRaw("FIELD(day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')")->get();
 
-        // --- [BARU] CHART 4: HARI TERSIBUK (Column/Bar Chart Vertical) ---
-        // Melihat hari apa yang paling banyak jadwal konselingnya
-        $dayData = Konseling::select(DB::raw('DAYNAME(consultation_date) as day'), DB::raw('count(*) as total'))
-            ->groupBy('day')
-            // Trik MySQL untuk mengurutkan hari Senin s/d Minggu
-            ->orderByRaw("FIELD(day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')")
-            ->get();
+        $mapHari = ['Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu', 'Sunday' => 'Minggu'];
+        $chartHariLabels = $hariData->map(fn($item) => $mapHari[$item->day] ?? $item->day);
+        $chartHariData = $hariData->pluck('total');
 
-        // Translate hari ke Indonesia (Opsional, manual mapping agar rapi)
-        $indoDays = [
-            'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu',
-            'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu', 'Sunday' => 'Minggu'
-        ];
-
-        $chartDayLabels = $dayData->map(fn($item) => $indoDays[$item->day] ?? $item->day);
-        $chartDayData = $dayData->pluck('total');
+        // Kirim nama bulan saat ini untuk judul grafik
+        $currentMonth = Carbon::now()->isoFormat('MMMM Y');
 
         return view('admin.dashboard', compact(
             'stats', 'konselingsPending',
             'chartBookingLabels', 'chartBookingData',
             'chartLayananLabels', 'chartLayananData',
-            'chartMethodLabels', 'chartMethodData',
-            'chartDayLabels', 'chartDayData'
+            'chartMetodeLabels', 'chartMetodeData',
+            'chartHariLabels', 'chartHariData',
+            'currentMonth'
         ));
     }
 }

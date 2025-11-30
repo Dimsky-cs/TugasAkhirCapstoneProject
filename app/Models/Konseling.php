@@ -21,8 +21,10 @@ class Konseling extends Model
         'consultation_time',
         'description',
         'status',
-        'meeting_link',   // <--- BARU
-        'psikolog_notes', // <--- BARU
+        'meeting_link',
+        'psikolog_notes',
+        'rating',
+        'review',
     ];
 
     public function user()

@@ -27,7 +27,7 @@
                 <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
                     <div class="p-6 bg-white border-b border-gray-200">
 
-                        <!-- Toolbar Admin: Judul, Search, Export -->
+                        <!-- Toolbar Admin: Judul, Filter, Search, Export -->
                         <div class="flex flex-col lg:flex-row justify-between items-center gap-4 mb-4">
 
                             <!-- Judul Kecil -->
@@ -35,22 +35,43 @@
                                 <h1 class="text-xl font-bold text-gray-800">Semua Data</h1>
                             </div>
 
-                            <!-- Grup Kanan: Search & Export -->
-                            <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                            <!-- Grup Kanan: Filter, Search & Export -->
+                            <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto items-center">
 
-                                <!-- Search Form -->
+                                <!-- Form Gabungan (Filter & Search) -->
                                 <form action="{{ route('admin.konseling.index') }}" method="GET"
-                                    class="relative w-full sm:w-64">
-                                    <input type="text" name="search" value="{{ request('search') }}"
-                                        placeholder="Cari Klien, Psikolog, atau Status..."
-                                        class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-gray-800 focus:border-gray-800 text-sm w-full">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                        </svg>
+                                    class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+
+                                    <!-- [BARU] Filter Status -->
+                                    <select name="status" onchange="this.form.submit()"
+                                        class="pl-3 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-gray-800 focus:border-gray-800 text-sm">
+                                        <option value="">Semua Status</option>
+                                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>
+                                            Pending</option>
+                                        <option value="confirmed"
+                                            {{ request('status') == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
+                                        <option value="completed"
+                                            {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                                        <option value="cancelled"
+                                            {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                    </select>
+
+                                    <!-- Search Input -->
+                                    <div class="relative w-full sm:w-64">
+                                        <input type="text" name="search" value="{{ request('search') }}"
+                                            placeholder="Cari Klien / Psikolog..."
+                                            class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-gray-800 focus:border-gray-800 text-sm w-full">
+                                        <div
+                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                            </svg>
+                                        </div>
                                     </div>
+
+                                    <!-- Hidden Sorting (Agar tidak reset saat filter) -->
                                     <input type="hidden" name="sort_by" value="{{ request('sort_by') }}">
                                     <input type="hidden" name="sort_direction" value="{{ request('sort_direction') }}">
                                 </form>
@@ -81,7 +102,7 @@
                                             <!-- Klien (Sortable) -->
                                             <th
                                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer group">
-                                                <a href="{{ route('admin.konseling.index', ['sort_by' => 'user_id', 'sort_direction' => request('sort_direction') == 'asc' ? 'desc' : 'asc', 'search' => request('search')]) }}"
+                                                <a href="{{ route('admin.konseling.index', array_merge(request()->all(), ['sort_by' => 'user_id', 'sort_direction' => request('sort_direction') == 'asc' ? 'desc' : 'asc'])) }}"
                                                     class="flex items-center">
                                                     Klien
                                                     <span class="ml-1 text-gray-400 group-hover:text-gray-800">⇅</span>
@@ -91,7 +112,7 @@
                                             <!-- Jadwal (Sortable) -->
                                             <th
                                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer group">
-                                                <a href="{{ route('admin.konseling.index', ['sort_by' => 'consultation_date', 'sort_direction' => request('sort_direction') == 'asc' ? 'desc' : 'asc', 'search' => request('search')]) }}"
+                                                <a href="{{ route('admin.konseling.index', array_merge(request()->all(), ['sort_by' => 'consultation_date', 'sort_direction' => request('sort_direction') == 'asc' ? 'desc' : 'asc'])) }}"
                                                     class="flex items-center">
                                                     Jadwal
                                                     <span class="ml-1 text-gray-400 group-hover:text-gray-800">
@@ -114,11 +135,17 @@
                                             <!-- Status (Sortable) -->
                                             <th
                                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer group">
-                                                <a href="{{ route('admin.konseling.index', ['sort_by' => 'status', 'sort_direction' => request('sort_direction') == 'asc' ? 'desc' : 'asc', 'search' => request('search')]) }}"
+                                                <a href="{{ route('admin.konseling.index', array_merge(request()->all(), ['sort_by' => 'status', 'sort_direction' => request('sort_direction') == 'asc' ? 'desc' : 'asc'])) }}"
                                                     class="flex items-center">
                                                     Status
                                                     <span class="ml-1 text-gray-400 group-hover:text-gray-800">⇅</span>
                                                 </a>
+                                            </th>
+
+                                            <!-- Rating & Ulasan -->
+                                            <th
+                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Rating & Ulasan
                                             </th>
 
                                             <th
@@ -160,6 +187,35 @@
                                                         {{ ucfirst($booking->status) }}
                                                     </span>
                                                 </td>
+
+                                                <!-- Isi Kolom Rating -->
+                                                <td class="px-6 py-4">
+                                                    @if ($booking->status == 'completed')
+                                                        @if ($booking->rating)
+                                                            <div class="flex flex-col">
+                                                                <div class="text-yellow-400 text-xs tracking-wide mb-1">
+                                                                    @for ($i = 0; $i < $booking->rating; $i++)
+                                                                        ★
+                                                                    @endfor
+                                                                    <span
+                                                                        class="text-gray-400 ml-1">({{ $booking->rating }}/5)</span>
+                                                                </div>
+                                                                @if ($booking->review)
+                                                                    <p class="text-xs text-gray-600 italic line-clamp-2"
+                                                                        title="{{ $booking->review }}">
+                                                                        "{{ Str::limit($booking->review, 30) }}"
+                                                                    </p>
+                                                                @endif
+                                                            </div>
+                                                        @else
+                                                            <span class="text-xs text-gray-400 italic">Belum ada
+                                                                ulasan</span>
+                                                        @endif
+                                                    @else
+                                                        <span class="text-gray-300">-</span>
+                                                    @endif
+                                                </td>
+
                                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                     <div class="flex justify-end items-center space-x-2">
                                                         <a href="{{ route('admin.konseling.edit', $booking->id) }}"

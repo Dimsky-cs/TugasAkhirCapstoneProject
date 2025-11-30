@@ -4,8 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Http\Request; // <-- [PENTING] Tambahkan ini
-use Illuminate\Support\Facades\Auth; // <-- [PENTING] Tambahkan ini
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -13,52 +12,54 @@ use Illuminate\Validation\Rules\Password;
 class UserManagementController extends Controller
 {
     /**
-     * Menampilkan daftar semua user (Read)
-     * [VERSI BARU DENGAN FILTER DAN PENCARIAN]
+     * Menampilkan daftar user dengan Fitur Search, Filter, dan Sorting.
      */
-    public function index(Request $request) // <-- Tambahkan Request $request
+    public function index(Request $request)
     {
-        // Ambil filter dari URL query
-        $search = $request->query('search');
-        $role = $request->query('role');
+        // 1. Ambil Parameter dari URL
+        $search = $request->input('search');
+        $role = $request->input('role');
+        $sortBy = $request->input('sort_by', 'created_at'); // Default: Tanggal Gabung
+        $sortDir = $request->input('sort_direction', 'desc'); // Default: Terbaru
 
-        // Mulai query
-        $query = User::orderBy('name', 'asc');
+        // 2. Query Dasar
+        $query = User::query();
 
-        // Terapkan filter PENCARIAN jika ada
+        // 3. Logika SEARCH (Pencarian)
         $query->when($search, function ($q) use ($search) {
-            // Cari di nama ATAU email
             $q->where(function($subQuery) use ($search) {
                 $subQuery->where('name', 'like', "%{$search}%")
                          ->orWhere('email', 'like', "%{$search}%");
             });
         });
 
-        // Terapkan filter ROLE jika ada
+        // 4. Logika FILTER (Role)
         $query->when($role, function ($q) use ($role) {
             $q->where('role', $role);
         });
 
-        // Ambil hasilnya dengan pagination
-        $users = $query->paginate(15)
-                       ->appends($request->query()); // <-- [PENTING] Agar pagination tetap membawa filter
+        // 5. Logika SORTING (Pengurutan) - INI YANG KURANG SEBELUMNYA
+        $allowedSorts = ['name', 'email', 'role', 'created_at']; // Kolom yang diizinkan
 
-        return view('admin.users.index', compact('users', 'search', 'role'));
+        if (in_array($sortBy, $allowedSorts)) {
+            $query->orderBy($sortBy, $sortDir);
+        } else {
+            $query->orderBy('created_at', 'desc'); // Fallback default
+        }
+
+        // 6. Ambil Data + Pagination
+        // Gunakan appends() agar parameter search/sort tidak hilang saat pindah halaman
+        $users = $query->paginate(10)->appends($request->all());
+
+        return view('admin.users.index', compact('users'));
     }
 
-    /**
-     * Menampilkan form untuk membuat user baru (Create)
-     */
     public function create()
     {
-        // Definisikan daftar layanan/spesialisasi di sini
-        $specialtiesList = ['karier', 'stres', 'hubungan', 'kecemasan'];
+        $specialtiesList = ['Kecemasan', 'Karier', 'Hubungan', 'Stres', 'Depresi'];
         return view('admin.users.create', compact('specialtiesList'));
     }
 
-    /**
-     * Menyimpan user baru ke database (Create)
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -75,26 +76,19 @@ class UserManagementController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => $validated['role'],
-            'specialties' => $validated['role'] === 'psikolog' ? $validated['specialties'] : null,
-            'email_verified_at' => now(), // Anggap user buatan admin sudah terverifikasi
+            'specialties' => $validated['role'] === 'psikolog' ? ($validated['specialties'] ?? []) : null,
+            'email_verified_at' => now(),
         ]);
 
         return redirect()->route('admin.users.index')->with('success', 'User baru berhasil dibuat.');
     }
 
-    /**
-     * Menampilkan form untuk mengedit user (Update)
-     */
     public function edit(User $user)
     {
-        // Definisikan daftar layanan/spesialisasi di sini
-        $specialtiesList = ['karier', 'stres', 'hubungan', 'kecemasan'];
+        $specialtiesList = ['Kecemasan', 'Karier', 'Hubungan', 'Stres', 'Depresi'];
         return view('admin.users.edit', compact('user', 'specialtiesList'));
     }
 
-    /**
-     * Memperbarui data user di database (Update)
-     */
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
@@ -106,13 +100,17 @@ class UserManagementController extends Controller
             'specialties.*' => 'string',
         ]);
 
-        // Update data dasar
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->role = $validated['role'];
-        $user->specialties = $validated['role'] === 'psikolog' ? $validated['specialties'] : null;
 
-        // Hanya update password JIKA diisi
+        // Handle specialties: Jika psikolog, simpan array. Jika bukan, null.
+        if ($validated['role'] === 'psikolog') {
+            $user->specialties = $validated['specialties'] ?? [];
+        } else {
+            $user->specialties = null;
+        }
+
         if (!empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
         }
@@ -122,21 +120,13 @@ class UserManagementController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'Data user berhasil diperbarui.');
     }
 
-    /**
-     * Menghapus user dari database (Delete)
-     */
     public function destroy(User $user)
     {
-        // Tambahkan pengaman agar tidak bisa hapus diri sendiri
-        if (Auth::id() === $user->id) {
-            return back()->withErrors(['delete' => 'Anda tidak bisa menghapus akun Anda sendiri.']);
+        if (auth()->id() === $user->id) {
+            return back()->with('error', 'Anda tidak bisa menghapus akun sendiri.');
         }
 
-        try {
-             $user->delete();
-             return redirect()->route('admin.users.index')->with('success', 'User berhasil dihapus.');
-        } catch (\Exception $e) {
-             return back()->withErrors(['delete' => 'Gagal menghapus user. Mungkin user ini masih memiliki jadwal booking terkait.']);
-        }
+        $user->delete();
+        return redirect()->route('admin.users.index')->with('success', 'User berhasil dihapus.');
     }
 }

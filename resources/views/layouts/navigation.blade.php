@@ -55,7 +55,7 @@
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
                             <button
-                                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-extrabold text-pink-600 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
                                 <div>{{ Auth::user()->name }}</div>
                                 <div class="ms-1">
                                     <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
@@ -78,6 +78,9 @@
 
                                 <x-dropdown-link :href="route('admin.users.index')">
                                     {{ __('Manajemen User') }}
+                                </x-dropdown-link>
+                                <x-dropdown-link :href="route('admin.konseling.index')">
+                                    {{ __('Manajemen Jadwal') }}
                                 </x-dropdown-link>
                             @elseif (Auth::user()->role === 'psikolog')
                                 {{-- UNTUK PSIKOLOG --}}
@@ -121,6 +124,22 @@
                 @endauth
             </div>
 
+            @guest
+                <!-- Tombol Login/Register MOBILE (Priority Action) -->
+                {{-- Tombol ini HANYA tampil saat GUEST dan di layar kecil (sm:hidden) --}}
+                <div class="flex sm:hidden items-center space-x-2">
+                    <a href="{{ route('login') }}"
+                        class="px-3 py-1.5 text-sm font-semibold text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-150">
+                        {{ __('Log in') }}
+                    </a>
+                    @if (Route::has('register'))
+                        <a href="{{ route('register') }}"
+                            class="px-3 py-1.5 text-sm font-semibold text-white bg-green-500 rounded-lg hover:bg-green-600 transition duration-150">
+                            {{ __('Register') }}
+                        </a>
+                    @endif
+                </div>
+            @endguest
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
                 <button @click="open = ! open"
@@ -200,17 +219,5 @@
             </div>
         @endauth
 
-        {{-- Tampilkan menu login/register untuk GUEST di mobile --}}
-        @guest
-            <div class="pt-4 pb-3 border-t border-gray-200 space-y-2">
-                <a href="{{ route('login') }}"
-                    class="block ps-3 pe-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50">Log
-                    in</a>
-                @if (Route::has('register'))
-                    <a href="{{ route('register') }}"
-                        class="block ps-3 pe-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50">Register</a>
-                @endif
-            </div>
-        @endguest
     </div>
 </nav>
